@@ -9,9 +9,12 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@haravan/escpos": "^1.2.9",
+    "buffer": "^6.0.3",
     "expo": "~53.0.9",
     "react": "19.0.0",
-    "react-native": "0.79.2"
+    "react-native": "0.79.2",
+    "react-native-tcp-socket": "^6.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
