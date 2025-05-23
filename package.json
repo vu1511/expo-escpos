@@ -1,7 +1,7 @@
 {
   "name": "expo-escpos",
-  "version": "0.1.0",
-  "description": "My new module",
+  "version": "1.0.0",
+  "description": "A comprehensive Expo module for ESC/POS thermal printer integration. Supports text formatting, image printing, and receipt generation for 58mm and 80mm thermal printers. Features include text alignment, font styling (bold, italic, underline), image rendering from base64, paper cutting, and cash drawer control. Compatible with major thermal printer brands including Epson, Star, Citizen, Bixolon, and Zjiang printers.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
@@ -19,7 +19,18 @@
     "react-native",
     "expo",
     "expo-escpos",
-    "ExpoEscpos"
+    "ExpoEscpos",
+    "thermal-printer",
+    "escpos",
+    "receipt-printer",
+    "pos-printer",
+    "epson",
+    "star",
+    "citizen",
+    "bixolon",
+    "zjiang",
+    "receipt",
+    "printing"
   ],
   "repository": "https://github.com/vu1511/expo-escpos",
   "bugs": {
