@@ -9,7 +9,6 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@haravan/escpos": "^1.2.9",
     "buffer": "^6.0.3",
     "expo": "~53.0.9",
     "react": "19.0.0",

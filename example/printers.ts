@@ -2,15 +2,16 @@ import ExpoEscposModule from "expo-escpos";
 import { Buffer } from "buffer";
 import TcpSocket from "react-native-tcp-socket";
 import Socket from "react-native-tcp-socket/lib/types/Socket";
-import { receiptImages, socialReceipt } from "@haravan/escpos";
 
 export const handlePrint = async () => {
   try {
-    const renderData = await ExpoEscposModule.renderImages(
-      { model: "58" },
+    const renderData = ExpoEscposModule.renderImages(
+      { model: "80" },
       imageBase64s
     );
     // const renderData = receiptImages({ model: "80" }, imageBase64s);
+    console.log(renderData);
+    // console.log(renderData);
     const data = Buffer.from(renderData);
     await sendTcpData(data, { port: 9100, host: "192.168.16.254" });
   } catch (error) {
