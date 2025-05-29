@@ -63,7 +63,7 @@ const writeAsync = (client: Socket, data: Uint8Array): Promise<void> => {
 export const sendTcpData = async (
   data: Uint8Array,
   options: TcpOption,
-  chunkSize: number = 8192
+  chunkSize: number = 80000
 ) => {
   let client: Socket | null = null;
   try {

@@ -2,9 +2,7 @@ package expo.modules.escpos
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
 import android.util.Base64
 import kotlin.math.ceil
 
@@ -76,8 +74,6 @@ object Image {
 
         // Create a new bitmap for 1-bit black and white
         val bwBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bwBitmap)
-        val paint = Paint()
 
         // Convert each pixel to black or white using Floyd-Steinberg dithering
         val pixels = IntArray(width * height)

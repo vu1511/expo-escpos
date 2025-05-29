@@ -116,7 +116,6 @@ private func receiptRender(
   do {
     return try render(encoder)
   } catch {
-    print("Receipt rendering failed: \(error)")
     return []
   }
 }

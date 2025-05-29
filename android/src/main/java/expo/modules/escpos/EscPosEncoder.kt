@@ -1,5 +1,7 @@
 package expo.modules.escpos
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import expo.modules.escpos.Image.toRaster
 import kotlin.math.ceil
 import kotlin.math.min
@@ -423,18 +425,9 @@ class EscPosEncoder(private val options: Options = Options()) {
     }
 
     /**
-     * Print an image from base64 encoded data
+     * Print an image from bitmap
      */
-    fun image(base64: String): EscPosEncoder {
-        // Determine max width based on printer model
-        val maxWidthDots = when (options.width) {
-            46 -> 576  // 80mm printer: 576 dots
-            32 -> 464  // 58mm printer: 464 dots
-            else -> 576
-        }
-
-        // Load and scale image optimized for thermal printer
-        val bitmap = Image.loadForThermalPrinter(base64, maxWidthDots)
+    fun image(bitmap: Bitmap): EscPosEncoder {
         val raster = bitmap.toRaster()
 
         // The raster data already has the correct bytes per line calculation
@@ -463,6 +456,30 @@ class EscPosEncoder(private val options: Options = Options()) {
         queue(imageData)
         flush()
         return this
+    }
+
+    /**
+     * Print an image from base64 encoded data
+     */
+    fun imageBase64(base64: String): EscPosEncoder {
+        // Determine max width based on printer model
+        val maxWidthDots = when (options.width) {
+            46 -> 576  // 80mm printer: 576 dots
+            32 -> 464  // 58mm printer: 464 dots
+            else -> 576
+        }
+        // Load and scale image optimized for thermal printer
+        val bitmap = Image.loadForThermalPrinter(base64, maxWidthDots)
+        return image(bitmap)
+    }
+
+    /**
+     * Print an image from png
+     */
+    fun imagePng(image: ByteArray): EscPosEncoder {
+        // Load and scale image optimized for thermal printer
+        val bitmap = BitmapFactory.decodeByteArray(image, 0, image.size)
+        return image(bitmap)
     }
 
     /**

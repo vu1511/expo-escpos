@@ -25,7 +25,6 @@ class StylePreservingWebViewDelegate: NSObject, WKNavigationDelegate {
     let options = HtmlToImagesOptions(dictionary: config)
     let printerWidth: CGFloat = options.model == .model58 ? 384 : 576
     let maxHeight: CGFloat = options.maxHeightToBreak ?? 1600
-    print(maxHeight)
 
     return try await withCheckedThrowingContinuation { continuation in
       // Create WebView on main thread

@@ -11,34 +11,43 @@ data class ReceiptConfig(
     val model: ReceiptModel
 )
 
-/**
- * Generate a receipt with a single image
- */
-@OptIn(ExperimentalUnsignedTypes::class)
-fun receiptImage(config: ReceiptConfig, imageBase64: String): ByteArray {
-    return receiptRender(config) { encoder ->
-        renderImages(encoder, listOf(imageBase64))
-    }
-}
-
-/**
- * Generate a receipt with multiple images
- */
 fun receiptImages(config: ReceiptConfig, imageBase64s: List<String>): ByteArray {
     return receiptRender(config) { encoder ->
         renderImages(encoder, imageBase64s)
     }
 }
 
-/**
- * Render one or more images as a receipt
- */
+fun receiptPngImages(config: ReceiptConfig, images: List<ByteArray>): ByteArray {
+    return receiptRender(config) { encoder ->
+        renderPngImages(encoder, images)
+    }
+}
+
 @OptIn(ExperimentalUnsignedTypes::class)
 private fun renderImages(encoder: EscPosEncoder, imageBase64s: List<String>): ByteArray {
     encoder.align("center")
 
     for (img in imageBase64s) {
-        encoder.image(img)
+        encoder.imageBase64(img)
+    }
+
+    // Add space at the end and cut
+    encoder.newline()
+        .newline()
+        .newline()
+        .newline()
+        .newline()
+        .cut()
+
+    return encoder.encode()
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+private fun renderPngImages(encoder: EscPosEncoder, images: List<ByteArray>): ByteArray {
+    encoder.align("center")
+
+    for (img in images) {
+        encoder.imagePng(img)
     }
 
     // Add space at the end and cut

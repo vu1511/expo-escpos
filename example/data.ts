@@ -8,14 +8,6 @@ export const commentReceiptHtml = `<html lang="en">
     <title>Haravan</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
-      @media print {
-        body {
-          zoom: 250% !important;
-        }
-        .cssMobile {
-          display: block !important;
-        }
-      }
       * {
         margin: 0;
         padding: 0;
@@ -32,8 +24,8 @@ export const commentReceiptHtml = `<html lang="en">
       body {
         width: 100%;
         font-family: sans-serif;
-        zoom: 120%;
         -webkit-text-size-adjust: 100%;
+        zoom: 60%;
       }
       .page-name {
         font-size: 35px;
@@ -244,14 +236,6 @@ export const generateShipmentHtml = (length: number = 10) => `
 <title>Haravan</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <style>
-  @media print {
-    body {
-      zoom: 250% !important;
-    }
-    .cssMobile {
-      display: block !important;
-    }
-  }
   @page {
     margin: 0;
   }
@@ -260,6 +244,7 @@ export const generateShipmentHtml = (length: number = 10) => `
     width: 100%;
     margin: 0;
     font-family: sans-serif;
+    zoom: 60%;
   }
   .table {
     font-size: 30px !important;
