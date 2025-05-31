@@ -31,7 +31,6 @@ object HtmlToImage {
             try {
                 val webView = WebView(context)
                 webView.settings.javaScriptEnabled = true
-                webView.settings.loadWithOverviewMode = true
                 webView.settings.useWideViewPort = true
                 webView.setBackgroundColor(Color.WHITE)
 
@@ -40,13 +39,19 @@ object HtmlToImage {
 
                 webView.webViewClient = object : WebViewClient() {
                     override fun onPageFinished(view: WebView, url: String) {
-                        val heightScript = "(function() { return document.body.scrollHeight; })();"
+                        val density = webView.resources.displayMetrics.density
+                        val zoomPercentage = (1.0 / density * 100).toInt()
+                        val jsScript = """
+                            (function() {
+                                document.body.style.zoom = '$zoomPercentage%';
+                                return document.body.scrollHeight;
+                            })();
+                        """.trimIndent()
 
-                        webView.evaluateJavascript(heightScript) { heightString ->
+                        webView.evaluateJavascript(jsScript) { heightString ->
                             val height = heightString.toFloatOrNull()
 
                             if (height != null) {
-                                val density = webView.resources.displayMetrics.density
                                 val contentHeight = (height * density).toInt()
 
                                 try {

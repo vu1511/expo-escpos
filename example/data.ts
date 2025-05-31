@@ -25,7 +25,6 @@ export const commentReceiptHtml = `<html lang="en">
         width: 100%;
         font-family: sans-serif;
         -webkit-text-size-adjust: 100%;
-        zoom: 60%;
       }
       .page-name {
         font-size: 35px;
@@ -244,7 +243,6 @@ export const generateShipmentHtml = (length: number = 10) => `
     width: 100%;
     margin: 0;
     font-family: sans-serif;
-    zoom: 60%;
   }
   .table {
     font-size: 30px !important;
@@ -496,6 +494,62 @@ export const generateShipmentHtml = (length: number = 10) => `
     ></div>
   </div>
 </div>
+</body>
+</html>
+`;
+
+export const exampleHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive WebView Page</title>
+  <style>
+    /* Reset default margins and paddings */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    /* Ensure images scale properly on different screen sizes */
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    /* Example of a responsive container */
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to the WebView</h1>
+    <p>This is a sample HTML page optimized for display within an Android WebView.</p>
+    <p>Resize the window or view on different devices to see responsive behavior.</p>
+  </div>
 </body>
 </html>
 `;

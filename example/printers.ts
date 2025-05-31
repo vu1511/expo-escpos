@@ -2,7 +2,6 @@ import ExpoEscposModule from "expo-escpos";
 import TcpSocket from "react-native-tcp-socket";
 import Socket from "react-native-tcp-socket/lib/types/Socket";
 import { commentReceiptHtml, generateShipmentHtml } from "./data";
-import { Alert } from "react-native";
 
 type TcpOption = {
   port: number;
@@ -14,12 +13,12 @@ export const handlePrint = async (html: string, host: string) => {
   const receiptData = await ExpoEscposModule.renderHtmlToImages(html, {
     model: "80",
   });
-  const endTime = performance.now();
   sendTcpData(receiptData, {
     port: 9100,
     host: host,
   });
-  Alert.alert(`Time taken: ${endTime - startTime}ms`);
+  const endTime = performance.now();
+  console.log(`Time taken: ${endTime - startTime}ms`);
 };
 
 export const printCommentReceipt = async (host: string) => {
