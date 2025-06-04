@@ -16,9 +16,13 @@ public class ExpoEscposModule: Module {
       Task {
         do {
           let pngImages = try await StylePreservingWebViewDelegate.renderHtmlToImages(config: config, html: html)
-          let receiptConfig = ReceiptOptions(dictionary: config)
-          let receiptData = receiptPngImages(config: receiptConfig, images: pngImages)
-          promise.resolve(receiptData)
+          let images = pngImages.compactMap { (image: Data) -> String in
+            image.base64EncodedString()
+          }
+          promise.resolve(images)
+//          let receiptConfig = ReceiptOptions(dictionary: config)
+//          let receiptData = receiptPngImages(config: receiptConfig, images: pngImages)
+//          promise.resolve(receiptData)
         } catch {
           promise.reject(
             "RENDER_IMAGES_ERROR",

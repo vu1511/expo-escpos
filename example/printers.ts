@@ -13,10 +13,11 @@ export const handlePrint = async (html: string, host: string) => {
   const receiptData = await ExpoEscposModule.renderHtmlToImages(html, {
     model: "80",
   });
-  sendTcpData(receiptData, {
-    port: 9100,
-    host: host,
-  });
+  console.log(receiptData)
+  // sendTcpData(receiptData, {
+  //   port: 9100,
+  //   host: host,
+  // });
   const endTime = performance.now();
   console.log(`Time taken: ${endTime - startTime}ms`);
 };

@@ -1,3 +1,5 @@
+import CoreImage
+import CoreImage.CIFilterBuiltins
 import ExpoModulesCore
 import UIKit
 import WebKit
@@ -19,6 +21,59 @@ class StylePreservingWebViewDelegate: NSObject, WKNavigationDelegate {
     super.init()
   }
 
+  private func generateQrCode(text: String, size: CGFloat = 150, errorCorrection: String = "M") -> Data? {
+    let data = text.data(using: .utf8)
+
+    let filter = CIFilter.qrCodeGenerator()
+    filter.message = data ?? Data()
+
+    switch errorCorrection.uppercased() {
+    case "L":
+      filter.correctionLevel = "L"
+    case "M":
+      filter.correctionLevel = "M"
+    case "Q":
+      filter.correctionLevel = "Q"
+    case "H":
+      filter.correctionLevel = "H"
+    default:
+      filter.correctionLevel = "M"
+    }
+
+    guard let outputImage = filter.outputImage else { return nil }
+
+    let scaleX = size / outputImage.extent.size.width
+    let scaleY = size / outputImage.extent.size.height
+    let transformedImage = outputImage.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
+
+    let context = CIContext()
+    guard let cgImage = context.createCGImage(transformedImage, from: transformedImage.extent) else { return nil }
+    let uiImage = UIImage(cgImage: cgImage)
+    guard let imageData = uiImage.pngData() else { return nil }
+
+    return imageData
+  }
+
+  private func generateBarcode(text: String, width: CGFloat = 200, height: CGFloat = 100) -> Data? {
+    let data = text.data(using: .utf8)
+
+    let filter = CIFilter.code128BarcodeGenerator()
+    filter.message = data ?? Data()
+
+    guard let outputImage = filter.outputImage else { return nil }
+
+    let scaleX = width / outputImage.extent.size.width
+    let scaleY = height / outputImage.extent.size.height
+    let transformedImage = outputImage.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
+
+    let context = CIContext()
+    guard let cgImage = context.createCGImage(transformedImage, from: transformedImage.extent) else { return nil }
+    let uiImage = UIImage(cgImage: cgImage)
+    guard let imageData = uiImage.pngData() else { return nil }
+
+    return imageData
+  }
+
   static func renderHtmlToImages(config: [String: Any], html: String)
     async throws -> [Data]
   {
@@ -29,13 +84,10 @@ class StylePreservingWebViewDelegate: NSObject, WKNavigationDelegate {
     return try await withCheckedThrowingContinuation { continuation in
       // Create WebView on main thread
       DispatchQueue.main.async {
-        // Create a dedicated WebView for this render operation
-        let webView = WKWebView(
-          frame: CGRect(x: 0, y: 0, width: printerWidth, height: 1))
+        let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: printerWidth, height: 1))
         webView.isOpaque = false
         webView.backgroundColor = UIColor.white
 
-        // Create a delegate to handle rendering
         let delegate = StylePreservingWebViewDelegate(
           webView: webView,
           width: printerWidth,
@@ -51,19 +103,137 @@ class StylePreservingWebViewDelegate: NSObject, WKNavigationDelegate {
         )
 
         webView.navigationDelegate = delegate
-        objc_setAssociatedObject(
-          webView, "delegate", delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-
-        // Load the HTML
+        objc_setAssociatedObject(webView, "delegate", delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         webView.loadHTMLString(html, baseURL: nil)
       }
     }
   }
 
   func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-    // Get content height and resize WebView
-    webView.evaluateJavaScript("document.body.scrollHeight") {
-      [weak self] (height, error) in
+    let convertScript = """
+      function convertCodeElements() {
+        const qrElements = document.querySelectorAll('[data-type="qrcode"]');
+        const barcodeElements = document.querySelectorAll('[data-type="barcode"]');
+        const allElements = [];
+        
+        qrElements.forEach((element, index) => {
+          const text = element.getAttribute('data-text') || element.textContent || '';
+          const size = element.getAttribute('data-size') || '150';
+          const errorCorrection = element.getAttribute('data-error-correction') || 'M';
+          
+          allElements.push({
+            type: 'qrcode',
+            text: text,
+            size: parseInt(size),
+            errorCorrection: errorCorrection,
+            elementId: 'qr-code-' + index
+          });
+          
+          element.setAttribute('data-processing-id', 'qr-code-' + index);
+        });
+        
+        barcodeElements.forEach((element, index) => {
+          const text = element.getAttribute('data-text') || element.textContent || '';
+          const width = element.getAttribute('data-width') || '200';
+          const height = element.getAttribute('data-height') || `${width / 2}`;
+          
+          allElements.push({
+            type: 'barcode',
+            text: text,
+            width: parseInt(width),
+            height: parseInt(height),
+            elementId: 'barcode-' + index
+          });
+          
+          element.setAttribute('data-processing-id', 'barcode-' + index);
+        });
+        
+        return allElements;
+      }
+      convertCodeElements();
+      """
+
+    webView.evaluateJavaScript(convertScript) { [weak self] (elementsData, error) in
+      guard let self = self else { return }
+
+      if let error = error {
+        self.completion(.failure(error))
+        return
+      }
+
+      guard let elements = elementsData as? [[String: Any]], !elements.isEmpty else {
+        self.getContentHeightAndResize()
+        return
+      }
+
+      self.processAllCodeElements(elements: elements)
+    }
+  }
+
+  private func processAllCodeElements(elements: [[String: Any]]) {
+    var processedElements: [String: String] = [:]
+
+    for elementData in elements {
+      guard let type = elementData["type"] as? String,
+        let text = elementData["text"] as? String,
+        let elementId = elementData["elementId"] as? String
+      else {
+        continue
+      }
+
+      var base64Image: String?
+      if type == "qrcode" {
+        guard let size = elementData["size"] as? Int else { continue }
+        let errorCorrection = elementData["errorCorrection"] as? String ?? "M"
+        let image = self.generateQrCode(text: text, size: CGFloat(size), errorCorrection: errorCorrection)
+        base64Image = image?.base64EncodedString()
+      } else if type == "barcode" {
+        let width = elementData["width"] as? Int ?? 200
+        let height = elementData["height"] as? Int ?? 100
+        let image = self.generateBarcode(text: text, width: CGFloat(width), height: CGFloat(height))
+        base64Image = image?.base64EncodedString()
+      }
+
+      if let imageBase64 = base64Image {
+        processedElements[elementId] = imageBase64
+      }
+    }
+
+    self.updateAllElements(processedElements: processedElements)
+  }
+
+  private func updateAllElements(processedElements: [String: String]) {
+    let updateScript = """
+      (function() {
+        \(processedElements.map { (elementId, base64) in
+        return """
+        const element\(elementId.replacingOccurrences(of: "-", with: "_")) = document.querySelector('[data-processing-id="\(elementId)"]');
+        if (element\(elementId.replacingOccurrences(of: "-", with: "_"))) {
+          const img = document.createElement('img');
+          img.src = 'data:image/png;base64,\(base64)';
+          img.style.display = 'block';
+          element\(elementId.replacingOccurrences(of: "-", with: "_")).innerHTML = '';
+          element\(elementId.replacingOccurrences(of: "-", with: "_")).appendChild(img);
+        }
+        """
+      }.joined(separator: "\n"))
+      })();
+      """
+
+    webView.evaluateJavaScript(updateScript) { [weak self] (_, error) in
+      guard let self = self else { return }
+
+      if let error = error {
+        self.completion(.failure(error))
+        return
+      }
+
+      self.getContentHeightAndResize()
+    }
+  }
+
+  private func getContentHeightAndResize() {
+    webView.evaluateJavaScript("document.body.scrollHeight") { [weak self] (height, error) in
       guard let self = self, let contentHeight = height as? CGFloat else {
         self?.completion(
           .failure(
@@ -76,8 +246,7 @@ class StylePreservingWebViewDelegate: NSObject, WKNavigationDelegate {
       }
 
       // Resize WebView to exact content dimensions
-      self.webView.frame = CGRect(
-        x: 0, y: 0, width: self.width, height: contentHeight)
+      self.webView.frame = CGRect(x: 0, y: 0, width: self.width, height: contentHeight)
 
       // Take snapshot after resize
       self.takeSnapshot()
