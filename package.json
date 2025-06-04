@@ -1,6 +1,6 @@
 {
   "name": "expo-escpos",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A comprehensive Expo module for ESC/POS thermal printer integration. Supports text formatting, image printing, and receipt generation for 58mm and 80mm thermal printers. Features include text alignment, font styling (bold, italic, underline), image rendering from base64, paper cutting, and cash drawer control. Compatible with major thermal printer brands including Epson, Star, Citizen, Bixolon, and Zjiang printers.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
