@@ -15,7 +15,7 @@ public class ExpoEscposModule: Module {
       (html: String, config: [String: Any], promise: Promise) in
       Task {
         do {
-          let pngImages = try await StylePreservingWebViewDelegate.renderHtmlToImages(config: config, html: html)
+          let pngImages = try await HtmlToImageConverter.renderHtmlToImages(config: config, html: html)
           let receiptConfig = ReceiptOptions(dictionary: config)
           let receiptData = receiptPngImages(config: receiptConfig, images: pngImages)
           promise.resolve(receiptData)

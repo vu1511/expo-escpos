@@ -22,7 +22,6 @@ export const commentReceiptHtml = `<html lang="en">
       }
       html,
       body {
-        width: 100%;
         font-family: sans-serif;
         -webkit-text-size-adjust: 100%;
       }
@@ -200,12 +199,8 @@ export const commentReceiptHtml = `<html lang="en">
         <p class="text-12-normal">A4</p>
       </div>
 
-      <div class="qr-code">
-        <img
-          src="data:image/jpeg;base64,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"
-          style="width: 104px; height: 104px"
-        />
-      </div>
+      <div class="qr-code" data-type="qrcode" data-size="200" data-error-correction="L">0977066122</div>
+      <div class="qr-code" data-type="barcode" data-width="200" data-height="40">0977066122</div>
 
       <div class="footer">
         <img

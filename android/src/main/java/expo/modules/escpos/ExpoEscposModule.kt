@@ -22,7 +22,7 @@ class ExpoEscposModule : Module() {
         val receiptModel = if (model == "58") ReceiptModel.MODEL_58 else ReceiptModel.MODEL_80
         val printerWidth = if (receiptModel == ReceiptModel.MODEL_58) 384 else 576
 
-        HtmlToImage.renderHtmlToImages(appContext.reactContext!!, html, printerWidth, maxHeightToBreak) { result ->
+        HtmlToImageConverter.renderHtmlToImages(appContext.reactContext!!, html, printerWidth, maxHeightToBreak) { result ->
           result.fold(
             onSuccess = { imageDataList ->
               val receiptConfig = ReceiptConfig(model = receiptModel)
