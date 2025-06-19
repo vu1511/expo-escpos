@@ -1,4 +1,4 @@
-import ExpoEscposModule from "expo-escpos";
+import { renderHtmlToImages } from "expo-escpos";
 import TcpSocket from "react-native-tcp-socket";
 import Socket from "react-native-tcp-socket/lib/types/Socket";
 import { commentReceiptHtml, generateShipmentHtml } from "./data";
@@ -10,7 +10,7 @@ type TcpOption = {
 
 export const handlePrint = async (html: string, host: string) => {
   const startTime = performance.now();
-  const receiptData = await ExpoEscposModule.renderHtmlToImages(html, {
+  const receiptData = await renderHtmlToImages(html, {
     model: "80",
   });
   sendTcpData(receiptData, {
